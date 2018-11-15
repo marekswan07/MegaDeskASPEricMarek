@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@Page.Title</title>
+    <link href="~/Styles/MegaDesk.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>MegaDesk</h1>
+        </div>
+        <div id="main">
+            @RenderBody()
+        </div>
+        <div id="footer">
+            &copy; @DateTime.Now.Year MegaDesk Application
+        </div>
+    </div>
+</body>
+</html>

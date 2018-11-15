@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MegaDeskASPEricMarek", "MegaDeskASPEricMarek\MegaDeskASPEricMarek.csproj", "{0D254BC2-5EA8-4FD4-BBD6-1A4F13FF8624}"
 EndProject
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D58F8014-6C65-4B10-997F-376C6DD3601A}
+		SolutionGuid = {3DE85827-D526-493F-B44F-9CFC63A3431D}
 	EndGlobalSection
 EndGlobal
