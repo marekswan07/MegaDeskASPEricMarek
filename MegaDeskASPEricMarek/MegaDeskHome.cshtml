@@ -1,0 +1,17 @@
+﻿@using WebMatrix.Data;
+
+@{
+    Layout = "~/_Layout.cshtml";
+
+    Page.Title = "Mega Desk Home";
+
+    var db = Database.Open("MegaDeskDB");
+    var selectCommand = "SELECT * FROM test";
+
+    var selectedData = db.Query(selectCommand);
+    var grid = new WebGrid(source: selectedData, defaultSort: "FirstName", rowsPerPage: 3);
+}
+<h2>List of Orders</h2>
+<div>
+    @grid.GetHtml();
+</div>

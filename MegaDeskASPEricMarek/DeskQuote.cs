@@ -187,33 +187,33 @@ namespace MegaDeskASPEricMarek
             int c = 0;
             int i = 0;
             string path = @"C:\Users\Marek\Documents\CIT365 Projects\MegaDesk4\MegaDesk3-MarekSwan\bin\Debug\rushOrderPrices.txt";
-            StreamReader reader = new StreamReader(path);
+            //StreamReader reader = new StreamReader(path);
 
             try
             {
-                foreach (string input in File.ReadLines(path))
-                {
-                    if (i == 3)
-                    {
-                        c++;
-                        i = 0;
-                        tempArray[c, i] = Convert.ToInt32(input);
-                        i++;
-                    }
-                    else
-                    {
-                        tempArray[c, i] = Convert.ToInt32(input);
-                        i++;
-                    }
+                //foreach (string input in File.ReadLines(path))
+                //{
+                //    if (i == 3)
+                //    {
+                //        c++;
+                //        i = 0;
+                //        tempArray[c, i] = Convert.ToInt32(input);
+                //        i++;
+                //    }
+                //    else
+                //    {
+                //        tempArray[c, i] = Convert.ToInt32(input);
+                //        i++;
+                //    }
 
-                }
+                //}
             }
             catch
             {
                 return null;
             }
 
-            reader.Close();
+            //reader.Close();
 
             //assign values to variables that way calculations may occur
             // 3 day rush prices
