@@ -6,12 +6,12 @@
     Page.Title = "Mega Desk Home";
 
     var db = Database.Open("MegaDeskDB");
-    var selectCommand = "SELECT * FROM test";
+    var selectCommand = "SELECT * FROM DeskQuotes";
 
     var selectedData = db.Query(selectCommand);
-    var grid = new WebGrid(source: selectedData, defaultSort: "FirstName", rowsPerPage: 3);
+    var grid = new WebGrid(source: selectedData, defaultSort: "QuoteID", rowsPerPage: 5);
 }
-<h2>List of Orders</h2>
+<h2>List of Quotes</h2>
 <div>
     @grid.GetHtml();
 </div>
