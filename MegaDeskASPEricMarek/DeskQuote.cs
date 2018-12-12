@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using WebMatrix.Data;
 
 
 //THIS IS WIP - DON'T USE THIS CLASS YET!
@@ -13,15 +15,14 @@ namespace MegaDeskASPEricMarek
         public int RushValue { get; set; }
         public decimal RushPrice { get; set; }
         public string RushString { get; set; }
-        public string CustName { get; set; }
-        public DateTime QuoteDate { get; set; }
+        //public string CustName { get; set; }
+        //public DateTime QuoteDate { get; set; }
         public decimal QuotePrice { get; set; }
         public int SurfaceMaterial { get; set; }
         public decimal SurfacePrice { get; set; }
         public decimal SurfaceAreaPrice { get; set; }
         public string SurfaceNme { get; set; }
         public decimal DrawPrice { get; set; }
-        public Array priceArray { get; set; }
         public Desk Desk;
 
         //const values that won't change for calcs for now (allows for easy modifcation)
@@ -51,16 +52,16 @@ namespace MegaDeskASPEricMarek
 
 
         //Default Constructor, creates the desk in the constructor so that way its already done
-        public DeskQuote(float width, float depth, int draws, int SurfaceMaterial, string CustName, int RushValue)
+        public DeskQuote(float width, float depth, int draws, int SurfaceMaterial, int RushValue)
         {
             Desk.Width = width;
             Desk.Depth = depth;
             Desk.NumOfDraws = draws;
             this.SurfaceMaterial = SurfaceMaterial;
-            this.CustName = CustName;
+            //this.CustName = CustName;
             this.RushValue = RushValue;
             this.DrawPrice = DRAWS_PRICE;
-            this.priceArray = GetRushOrder();
+            //this.priceArray = GetRushOrder();
         }
 
         //trying to figure out enums
@@ -96,6 +97,7 @@ namespace MegaDeskASPEricMarek
 
         public decimal CalcRush(int RushValue, float SurfaceArea)
         {
+
             if (SurfaceArea < 1000)
             {
                 switch (RushValue)
@@ -104,11 +106,11 @@ namespace MegaDeskASPEricMarek
                         this.RushString = "3 Day Rush";
                         this.RushPrice = RUSH_3DAY_L1000_PRICE;
                         return RUSH_3DAY_L1000_PRICE;
-                    case 2:
+                    case 4:
                         this.RushString = "5 Day Rush";
                         this.RushPrice = RUSH_5DAY_L1000_PRICE;
                         return RUSH_5DAY_L1000_PRICE;
-                    case 3:
+                    case 10:
                         this.RushString = "7 Day Rush";
                         this.RushPrice = RUSH_7DAY_L1000_PRICE;
                         return RUSH_7DAY_L1000_PRICE;
@@ -119,15 +121,15 @@ namespace MegaDeskASPEricMarek
             {
                 switch (RushValue)
                 {
-                    case 1:
+                    case 2:
                         this.RushString = "3 Day Rush";
                         this.RushPrice = RUSH_3DAY_1000_TO_2000_PRICE;
                         return RUSH_3DAY_1000_TO_2000_PRICE;
-                    case 2:
+                    case 5:
                         this.RushString = "5 Day Rush";
                         this.RushPrice = RUSH_5DAY_1000_TO_2000_PRICE;
                         return RUSH_5DAY_1000_TO_2000_PRICE;
-                    case 3:
+                    case 11:
                         this.RushString = "7 Day Rush";
                         this.RushPrice = RUSH_7DAY_1000_TO_2000_PRICE;
                         return RUSH_7DAY_1000_TO_2000_PRICE;
@@ -138,15 +140,15 @@ namespace MegaDeskASPEricMarek
             {
                 switch (RushValue)
                 {
-                    case 1:
+                    case 3:
                         this.RushString = "3 Day Rush";
                         this.RushPrice = RUSH_3DAY_G2000_PRICE;
                         return RUSH_3DAY_G2000_PRICE;
-                    case 2:
+                    case 9:
                         this.RushString = "5 Day Rush";
                         this.RushPrice = RUSH_5DAY_G2000_PRICE;
                         return RUSH_5DAY_G2000_PRICE;
-                    case 3:
+                    case 12:
                         this.RushString = "7 Day Rush";
                         this.RushPrice = RUSH_7DAY_G2000_PRICE;
                         return RUSH_7DAY_G2000_PRICE;
@@ -158,7 +160,7 @@ namespace MegaDeskASPEricMarek
             return DELIVERY_14_DAY_PRICE;
         }
 
-        public void CalcQuote()
+        public void CalcQuote(IEnumerable shippingDbData)
         {
 
             //base price
@@ -179,57 +181,6 @@ namespace MegaDeskASPEricMarek
             QuotePrice += CalcRush(this.RushValue, Desk.SurfaceArea);
 
             this.QuotePrice = QuotePrice;
-        }
-
-        public Array GetRushOrder()
-        {
-            int[,] tempArray = new int[3, 3];
-            int c = 0;
-            int i = 0;
-            string path = @"C:\Users\Marek\Documents\CIT365 Projects\MegaDesk4\MegaDesk3-MarekSwan\bin\Debug\rushOrderPrices.txt";
-            //StreamReader reader = new StreamReader(path);
-
-            try
-            {
-                //foreach (string input in File.ReadLines(path))
-                //{
-                //    if (i == 3)
-                //    {
-                //        c++;
-                //        i = 0;
-                //        tempArray[c, i] = Convert.ToInt32(input);
-                //        i++;
-                //    }
-                //    else
-                //    {
-                //        tempArray[c, i] = Convert.ToInt32(input);
-                //        i++;
-                //    }
-
-                //}
-            }
-            catch
-            {
-                return null;
-            }
-
-            //reader.Close();
-
-            //assign values to variables that way calculations may occur
-            // 3 day rush prices
-            RUSH_3DAY_L1000_PRICE = tempArray[0, 0];
-            RUSH_3DAY_1000_TO_2000_PRICE = tempArray[0, 1];
-            RUSH_3DAY_G2000_PRICE = tempArray[0, 2];
-            // 5 day rush prices 
-            RUSH_5DAY_L1000_PRICE = tempArray[1, 0];
-            RUSH_5DAY_1000_TO_2000_PRICE = tempArray[1, 1];
-            RUSH_5DAY_G2000_PRICE = tempArray[1, 2];
-            // 7 day rush prices
-            RUSH_7DAY_L1000_PRICE = tempArray[2, 0];
-            RUSH_7DAY_1000_TO_2000_PRICE = tempArray[2, 1];
-            RUSH_7DAY_G2000_PRICE = tempArray[2, 2];
-
-            return tempArray;
         }
 
     }

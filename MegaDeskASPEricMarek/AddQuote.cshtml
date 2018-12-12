@@ -1,0 +1,132 @@
+﻿@using WebMatrix.Data;
+@using System.Data;
+@using System.Data.SqlClient
+@{
+    Layout = "~/_Layout.cshtml";
+
+    Validation.RequireField("custName", "You must enter a Customer Name");
+
+    Validation.Add("width",
+    Validator.Required("A Width is required"),
+    Validator.Range(1, 96, "Must be between 1 and 96"));
+
+    Validation.Add("Length",
+    Validator.Required("A Length is required"),
+    Validator.Range(1, 48, "Must be between 1 and 48"));
+
+    Validation.RequireField("NumOfDraws", "Please enter a amount of draws");
+
+    var custName = "";
+    float width = 0;
+    float Length = 0;
+    int NumOfDraws = 0;
+    int testSurface = 0;
+    int testShipping = 0;
+    DateTime date = DateTime.Now;
+
+    var db = Database.Open("MegaDeskDB");
+    string selectSQLShipping = "select * from Shipping";
+    string selectSQLMaterials = "select * from Materials";
+
+    //use SQL command withing the DB Object
+    var selectedData = db.Query(selectSQLShipping);
+    var selectedMaterialData = db.Query(selectSQLMaterials);
+
+    //This reads a list to be added into the
+    IEnumerable<SelectListItem> ShippingItems = null;
+    ShippingItems = selectedData.Select(s => new SelectListItem
+    {
+        Value = s.ShippingID.ToString(),
+        Text = s.Speed,
+        Selected = s.ShippingID.ToString() == Request.Form["Shipping"] ? true : false
+    });
+
+    IEnumerable<SelectListItem> MaterialItems = null;
+
+    MaterialItems = selectedMaterialData.Select(m => new SelectListItem
+    {
+        Value = m.MaterialID.ToString(),
+        Text = m.MaterialType,
+        Selected = m.MaterialID.ToString() == Request.Form["Materials"] ? true : false
+    });
+
+    if (IsPost && Validation.IsValid())
+    {
+        //parse the values to the required formats
+        custName = Request.Form["custName"];
+        width = float.Parse(Request.Form["width"]);
+        Length = float.Parse(Request.Form["Length"]);
+        NumOfDraws = int.Parse(Request.Form["NumOfDraws"]);
+        testSurface = int.Parse(Request.Form["SurfaceMaterial"]);
+        testShipping = int.Parse(Request.Form["Shipping"]);
+
+
+        //Created object and utilisng methods for results
+        var quote = new MegaDeskASPEricMarek.DeskQuote(width,Length,NumOfDraws,testSurface,testShipping);
+        quote.CalcQuote(selectedData);
+        var quotePrice = quote.QuotePrice;
+
+        //Grab required info from DB before inserting into required tables
+        var db1 = Database.Open("MegaDeskDB");
+        var insertCommandDK = "INSERT INTO Desk (MaterialID, Width, Depth, NumOfDraws) VALUES (@0, @1, @2, @3)";
+        var insertCommandDQ = "INSERT INTO DeskQuotes (Price, Date, ShippingID) VALUES(@0, @1, @2)";
+
+
+        db1.Execute(insertCommandDK, testSurface, width, Length, NumOfDraws);
+        db1.Execute(insertCommandDQ, quotePrice, date, testShipping);
+
+        Response.Redirect("~/MegaDeskHome");
+
+    }
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>New Quote System</title>
+</head>
+<body>
+    <h1>Get a new Quote</h1>
+    <form method="post">
+        <fieldset>
+            <legend>Enter Quote Information</legend>
+            <p>
+                <label for="custName">Customer Name:</label>
+                <input type="text" name="custName" value="@Request.Form["custName"]" />
+                @Html.ValidationMessage("custName")
+            </p>
+
+            <p>
+                <label for="width">Width:</label>
+                <input type="text" name="width" value="@Request.Form["width"]" />
+                @Html.ValidationMessage("width")
+            </p>
+
+            <p>
+                <label for="Length">Length:</label>
+                <input type="text" name="Length" value="@Request.Form["Length"]" />
+                @Html.ValidationMessage("Length")
+            </p>
+
+            <p>
+                <label for="NumOfDraws">Number of Draws:</label>
+                <input type="text" name="NumOfDraws" value="@Request.Form["NumOfDraws"]" />
+                @Html.ValidationMessage("NumOfDraws")
+            </p>
+
+            <p>
+                <label for="SurfaceMaterial">Surface Material:</label>
+                @Html.DropDownList("SurfaceMaterial", MaterialItems)
+            </p>
+            <p>
+                <label for="Shipping">Delivery Speed:</label>
+                @Html.DropDownList("Shipping", ShippingItems)
+            </p>
+
+            <p><input type="submit" name="buttonSubmit" value="Submit Quote" /></p>
+        </fieldset>
+    </form>
+</body>
+</html>

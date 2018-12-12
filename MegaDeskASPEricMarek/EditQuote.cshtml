@@ -1,0 +1,109 @@
+﻿@using WebMatrix.Data;
+@{
+    Layout = "~/_Layout.cshtml";
+
+    var book = "";
+    var chapter = "";
+    var verse = "";
+    var text = "";
+    var scriptureId = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            scriptureId = Request.QueryString["ID"];
+            var db = Database.Open("MegaDeskDB");
+            var dbCommand = "SELECT * FROM Scriptures WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, scriptureId);
+            if (row != null)
+            {
+                book = row.Book;
+                chapter = row.Chapter.ToString();
+                verse = row.Verse;
+                text = row.Text;
+            }
+            else
+            {
+                Validation.AddFormError("No Scripture was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No Scripture was found for that ID.");
+        }
+    }
+
+    if (IsPost)
+    {
+        Validation.RequireField("book", "You must enter a Book");
+        Validation.RequireField("chapter", "A chapter is required");
+        Validation.RequireField("verse", "A verse is required");
+        Validation.RequireField("text", "Some Scriptual text is needed");
+        Validation.RequireField("scriptureId", "No Scripture ID was submitted!");
+
+        book = Request.Form["book"];
+        chapter = Request.Form["chapter"];
+        verse = Request.Form["verse"];
+        text = Request.Form["text"];
+        scriptureId = Request.Form["scriptureId"];
+
+        if (Validation.IsValid())
+        {
+            var db = Database.Open("WebPagesScriptures");
+            var updateCommand = "UPDATE Scriptures SET Book=@0, Chapter=@1, Verse=@2, Text=@3 WHERE Id=@4";
+            db.Execute(updateCommand, book, chapter, verse, text, scriptureId);
+            Response.Redirect("~/ViewScriptures");
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Edit a Scripture</title>
+    <style>
+        .validation-summary-errors {
+            border: 2px dashed red;
+            color: red;
+            font-weight: bold;
+            margin: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit a Scripture</h1>
+    @Html.ValidationSummary()
+    <form method="post">
+        <fieldset>
+            <legend>Movie Information</legend>
+
+            <p>
+                <label for="title">Book:</label>
+                <input type="text" name="book" value="@book" />
+            </p>
+
+            <p>
+                <label for="genre">Chapter:</label>
+                <input type="text" name="chapter" value="@chapter" />
+            </p>
+
+            <p>
+                <label for="year">Verse:</label>
+                <input type="text" name="verse" value="@verse" />
+            </p>
+
+            <p>
+                <label for="year">Scripture Text:</label>
+                <input type="text" name="text" value="@text" />
+            </p>
+
+            <input type="hidden" name="scriptureid" value="@scriptureId" />
+
+            <p><input type="submit" name="buttonSubmit" value="Submit Changes" /></p>
+        </fieldset>
+    </form>
+    <p><a href="~/ViewScriptures">Return to Scripture listings</a></p>
+</body>
+</html>
