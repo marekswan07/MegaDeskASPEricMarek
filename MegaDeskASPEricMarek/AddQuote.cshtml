@@ -4,6 +4,7 @@
 @{
     Layout = "~/_Layout.cshtml";
 
+    //Validation on the page that won't allow DB commands to run unless it passes
     Validation.RequireField("custName", "You must enter a Customer Name");
 
     Validation.Add("width",
@@ -16,6 +17,7 @@
 
     Validation.RequireField("NumOfDraws", "Please enter a amount of draws");
 
+    //variables that allow for values to be stored
     var custName = "";
     float width = 0;
     float Length = 0;
@@ -24,6 +26,7 @@
     int testShipping = 0;
     DateTime date = DateTime.Now;
 
+    //Opens Database connection and stores SQL commands for use when required
     var db = Database.Open("MegaDeskDB");
     string selectSQLShipping = "select * from Shipping";
     string selectSQLMaterials = "select * from Materials";
@@ -62,19 +65,31 @@
 
 
         //Created object and utilisng methods for results
-        var quote = new MegaDeskASPEricMarek.DeskQuote(width,Length,NumOfDraws,testSurface,testShipping);
+        var quote = new MegaDeskASPEricMarek.DeskQuote(width, Length, NumOfDraws, testSurface, testShipping);
         quote.CalcQuote(selectedData);
         var quotePrice = quote.QuotePrice;
 
         //Grab required info from DB before inserting into required tables
         var db1 = Database.Open("MegaDeskDB");
         var insertCommandDK = "INSERT INTO Desk (MaterialID, Width, Depth, NumOfDraws) VALUES (@0, @1, @2, @3)";
-        var insertCommandDQ = "INSERT INTO DeskQuotes (Price, Date, ShippingID) VALUES(@0, @1, @2)";
-
-
+        //executes the SQL commands and enters data into DB
         db1.Execute(insertCommandDK, testSurface, width, Length, NumOfDraws);
-        db1.Execute(insertCommandDQ, quotePrice, date, testShipping);
 
+        //Get Lastest from Desk Table
+        var latestFromDesk = db1.QuerySingle("SELECT @@IDENTITY FROM Desk");
+        int DeskID = latestFromDesk.DeskID;
+
+
+    
+        //var product = db.QuerySingle("SELECT * From products where ProductId = 1");
+        //@product.ProductName
+
+        var insertCommandDQ = "INSERT INTO DeskQuotes (Price, Date, ShippingID, CustName, DeskID) VALUES(@0, @1, @2, @3, @4)";
+
+        //executes the SQL commands and enters data into DB
+        db1.Execute(insertCommandDQ, quotePrice, date, testShipping, custName, latestFromDesk);
+
+        //Sends you back to the homepage
         Response.Redirect("~/MegaDeskHome");
 
     }

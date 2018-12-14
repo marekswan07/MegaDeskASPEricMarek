@@ -6,10 +6,10 @@
     Page.Title = "Mega Desk Home";
 
     var db = Database.Open("MegaDeskDB");
-    var selectCommand = "SELECT * FROM DeskQuotes";
+    var selectCommand ="SELECT * FROM DeskQuotes dq LEFT JOIN Desk d ON dq.DeskID = d.DeskId LEFT JOIN Materials m ON d.MaterialID = m.MaterialID LEFT JOIN Shipping s ON dq.ShippingID = s.ShippingID";
 
     var selectedData = db.Query(selectCommand);
-    var grid = new WebGrid(source: selectedData, defaultSort: "QuoteID", rowsPerPage: 5);
+    var grid = new WebGrid(source: selectedData, defaultSort: "CustName", rowsPerPage: 5);
 }
 <h2>List of Quotes</h2>
 <div>
@@ -21,14 +21,15 @@
     headerStyle: "head",
     alternatingRowStyle: "alt",
     columns: grid.Columns(
-    grid.Column("QuoteID"),
+    grid.Column("CustName"),
+    grid.Column("Width"),
+    grid.Column("Depth"),
+    grid.Column("NumOfDraws"),
+    grid.Column("MaterialType"),
+    grid.Column("Speed"),
     grid.Column("Price"),
-    grid.Column("Date"),
-    grid.Column("ShippingID"),
     grid.Column(format: @<a href="~/EditScripture">Edit</a>),
     grid.Column(format: @<a href="~/DeleteScripture">Delete</a>)
      )
     )
-    
-
 </div>
